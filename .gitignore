@@ -1,0 +1,19 @@
+# Avoid committing any actual data files
+# [These are considered confidential as per IRB protocol]
+
+*.csv
+*.tsv
+*.rdata
+*.dta
+*.sav
+*.xls
+*.xlsx
+*.nb.html
+*.html
+*.md
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+.DS_Store
+/data
