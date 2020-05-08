@@ -10,6 +10,7 @@
 # setup -------------------------------------------------------------------
 library(readr)
 library(dplyr)
+library(psych)
 
 # input -------------------------------------------------------------------
 
@@ -34,3 +35,30 @@ post <- read_csv("congruity_post.csv",
 pre %>% filter(Finished) %>% select(-Finished) -> pre
 post %>% filter(Finished) %>% select(-Finished) -> post
 
+
+# score -------------------------------------------------------------------
+
+# Score SPQ items and compute reliability
+spq_keys <- make.keys(post, list(SSM=sprintf("SS%d",seq(1:8)),
+                                 SPSL=sprintf("SPSL%d", seq(1:8)),
+                                 SoD=c("-SOD1", "SOD2", "-SOD3", "-SOD4", 
+                                  "-SOD5", "-SOD6", "-SOD7", "SOD8")))
+
+spq_scores <- scoreItems(ssq_keys, post)
+
+# Check reliability diagnostics (Cronbach's alpha)
+print(spq_scores$alpha, digits=3)
+
+# Bind aggregate scores to dataset
+post %>% bind_cols(as.data.frame(spq_scores$scores)) -> post
+
+# Calculate Simulator Sickness Scores
+post %>% 
+  select_at(vars(starts_with("SimSick"))) %>%  
+  replace(is.na(.), 0) %>%
+  transmute(SimSick = rowSums(.)) %>%
+  bind_cols(post, .) -> post
+
+# Trim redundant columns
+post %>% 
+  select(condition, control, SSM, SPSL, SoD, SimSick) -> post
