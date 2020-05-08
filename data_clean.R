@@ -100,5 +100,24 @@ post %>%
   group_by(id = rep(row_number(), length.out = n(), each = 3)) %>%
   mutate(RecordedDate = min(RecordedDate)) %>%
   difference_join(pre, ., by="RecordedDate", 
-                mode = "right", max_dist = 10) %>%
-  select(-RecordedDate.x, -RecordedDate.y) -> joined
+                mode = "right", max_dist = 10) -> joined
+
+## Clean up variable names and order
+joined %>%
+  select(id, RecordedDate.x,
+         GENDER, RACE, AGE_1, EDU,
+         ITQ_Total, ITQ_Focus, ITQ_Involvement, ITQ_Emotions, ITQ_Jeu,
+         condition, control,
+         SSM, SPSL, SoD, SimSick) -> joined
+
+colnames(joined) <- c("id", "date",
+                      "gender", "race", "age", "edu",
+                      "ITQ", "ITQ_focus", "ITQ_involvement", "ITQ_emotions", "ITQ_jeu",
+                      "condition", "control",
+                      "SSM", "SPSL", "SoD", "sim_sick")
+
+# export ------------------------------------------------------------------
+
+# Export as RDATA and CSV
+write_csv(joined, "data/congruity_data.csv", col_names = TRUE)
+saveRDS(joined, "data/congruity_data.rds")
