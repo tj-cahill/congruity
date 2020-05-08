@@ -34,6 +34,20 @@ post <- read_csv("congruity_post.csv",
 pre %>% filter(Finished) %>% select(-Finished) -> pre
 post %>% filter(Finished) %>% select(-Finished) -> post
 
+# Remove partial responses noted in study log, matching based on time window
+filter_windows <- data.frame(start=c(ymd_hms("2019-11-14-12-30-00"), 
+                                     ymd_hms("2019-11-18-11-30-00"),
+                                     ymd_hms("2019-11-21-11-35-00"),
+                                     ymd_hms("2020-02-03-10-00-00")),
+                             end=c(ymd_hms("2019-11-14-12-35-59"), 
+                                   ymd_hms("2019-11-18-11-45-59"),
+                                   ymd_hms("2019-11-21-11-40-59"),
+                                   ymd_hms("2020-02-03-10-15-59")))
+
+for (i in 1:nrow(filter_windows)) {
+  pre %>% filter(!(RecordedDate > filter_windows[i,1] & RecordedDate < filter_windows[i,2])) -> pre
+}
+
 # score -------------------------------------------------------------------
 
 # Score ITQ items and compute reliability
@@ -78,4 +92,13 @@ post %>%
 
 # merge -------------------------------------------------------------------
 
+# Merge pre- and post-test questionnaire responses based on fuzzy 
+# date matching with a window of 10 minutes (from pre-test to first post-test)
 
+post %>% 
+  arrange(RecordedDate) %>%
+  group_by(id = rep(row_number(), length.out = n(), each = 3)) %>%
+  mutate(RecordedDate = min(RecordedDate)) %>%
+  difference_join(pre, ., by="RecordedDate", 
+                mode = "right", max_dist = 10) %>%
+  select(-RecordedDate.x, -RecordedDate.y) -> joined
