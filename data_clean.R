@@ -26,3 +26,11 @@ post <- read_csv("congruity_post.csv",
   col_types = cols(RecordedDate = col_datetime(format = "%m/%d/%y %H:%M"), 
                    condition = col_factor(levels = c("SENSORY", "ENVIRONMENTAL", "THEMATIC")), 
                     control = col_factor(levels = c("CONTROL", "BREACH"))))
+
+
+# clean -------------------------------------------------------------------
+
+# Remove incomplete responses
+pre %>% filter(Finished) %>% select(-Finished) -> pre
+post %>% filter(Finished) %>% select(-Finished) -> post
+
