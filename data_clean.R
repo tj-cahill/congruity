@@ -28,13 +28,11 @@ post <- read_csv("congruity_post.csv",
                    condition = col_factor(levels = c("SENSORY", "ENVIRONMENTAL", "THEMATIC")), 
                     control = col_factor(levels = c("CONTROL", "BREACH"))))
 
-
 # clean -------------------------------------------------------------------
 
 # Remove incomplete responses
 pre %>% filter(Finished) %>% select(-Finished) -> pre
 post %>% filter(Finished) %>% select(-Finished) -> post
-
 
 # score -------------------------------------------------------------------
 
@@ -77,3 +75,7 @@ pre %>%
 
 post %>% 
   select(RecordedDate, condition, control, SSM, SPSL, SoD, SimSick) -> post
+
+# merge -------------------------------------------------------------------
+
+
