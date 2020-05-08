@@ -38,18 +38,29 @@ post %>% filter(Finished) %>% select(-Finished) -> post
 
 # score -------------------------------------------------------------------
 
+# Score ITQ items and compute reliability
+itq_keys <- make.keys(pre, list(ITQ_Total=sprintf("ITQ%d", seq(1:18)),
+                                ITQ_Focus=sprintf("ITQ%d", c(1, 2, 3, 8, 13)),
+                                ITQ_Involvement=sprintf("ITQ%d", c(4, 5, 10, 12, 18)),
+                                ITQ_Emotions=sprintf("ITQ%d", c(11, 15, 16, 17)),
+                                ITQ_Jeu=sprintf("ITQ%d", c(6, 9, 14))))
+
+itq_scores <- scoreItems(itq_keys, pre, totals=TRUE)
+
 # Score SPQ items and compute reliability
 spq_keys <- make.keys(post, list(SSM=sprintf("SS%d",seq(1:8)),
                                  SPSL=sprintf("SPSL%d", seq(1:8)),
                                  SoD=c("-SOD1", "SOD2", "-SOD3", "-SOD4", 
                                   "-SOD5", "-SOD6", "-SOD7", "SOD8")))
 
-spq_scores <- scoreItems(ssq_keys, post)
+spq_scores <- scoreItems(spq_keys, post)
 
 # Check reliability diagnostics (Cronbach's alpha)
+print(itq_scores$alpha, digits=3)
 print(spq_scores$alpha, digits=3)
 
 # Bind aggregate scores to dataset
+pre %>% bind_cols(as.data.frame(itq_scores$scores)) -> pre
 post %>% bind_cols(as.data.frame(spq_scores$scores)) -> post
 
 # Calculate Simulator Sickness Scores
@@ -60,5 +71,9 @@ post %>%
   bind_cols(post, .) -> post
 
 # Trim redundant columns
+pre %>%
+  select(RecordedDate, GENDER, RACE, AGE_1, EDU,
+         ITQ_Total, ITQ_Focus, ITQ_Involvement, ITQ_Emotions, ITQ_Jeu) -> pre
+
 post %>% 
-  select(condition, control, SSM, SPSL, SoD, SimSick) -> post
+  select(RecordedDate, condition, control, SSM, SPSL, SoD, SimSick) -> post
