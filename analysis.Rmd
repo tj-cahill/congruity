@@ -1,0 +1,12 @@
+---
+title: "Responses to Virtual Environments - Preliminary Analysis"
+author: Tiernan J. Cahill
+output: html_notebook
+---
+
+```{r setup, include=FALSE}
+library(dplyr)
+library(knitr)
+
+con.data <- readRDS("data/congruity_data.rds")
+```
