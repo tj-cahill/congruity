@@ -161,3 +161,56 @@ enviro_data %>%
 ```
 
 In this case, because the test is one-sided, a p-value < 0.1 is considered significant, which remains the case for Suspension of Disbelief in the environmnental breach condition, even when controlling for immersive tendencies.
+
+
+### Thematic
+Finally, let's repeat all of the above steps for the thematic breach condition.
+
+```{r thematic-viz, warnings = FALSE}
+thematic_data <- study_data %>%
+  filter(condition == "THEMATIC")
+
+# Spatial situation
+thematic_data %>%
+  ggplot(aes(x = control, y = SSM)) +
+  geom_boxplot(fill = "#5964B3", alpha = 0.8) + 
+  xlab("Condition") + ylab("Spatial Situation")
+
+# Self-presence / Self-location
+thematic_data %>%
+  ggplot(aes(x = control, y = SPSL)) +
+  geom_boxplot(fill = "#3439C8", alpha = 0.8) + 
+  xlab("Condition") + ylab("Self-Presence / Self-Location")
+
+# Suspension of disbelief
+thematic_data %>%
+  ggplot(aes(x = control, y = SoD)) +
+  geom_boxplot(fill = "#004DC3", alpha = 0.8) + 
+  xlab("Condition") + ylab("Suspension of Disbelief")
+```
+
+```{r thematic-tests}
+bartlett.test(SSM ~ control, thematic_data)
+t.test(SSM ~ control, thematic_data, alternative = "greater", var.equal = TRUE)
+
+bartlett.test(SPSL ~ control, thematic_data)
+t.test(SPSL ~ control, thematic_data, alternative = "greater", var.equal = TRUE)
+
+bartlett.test(SoD ~ control, thematic_data)
+t.test(SoD ~ control, thematic_data, alternative = "greater", var.equal = TRUE)
+```
+
+It appears that self-presence / self-location is significantly lower in the thematic breach condition. Let's now control for immersive tendencies, as before.
+
+```{r thematic-tests-control}
+thematic_data %>%
+  anova_test(SSM ~ ITQ + control, type = 3)
+
+thematic_data %>%
+  anova_test(SPSL ~ ITQ + control, type = 3)
+
+thematic_data %>%
+  anova_test(SoD ~ ITQ + control, type = 3)
+```
+
+The previous findings are mirrored in the ANCOVA test.
