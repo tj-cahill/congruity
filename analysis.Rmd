@@ -18,26 +18,78 @@ Before we beginning our analysis, we check to see if the measured variables of i
 ```{r diag}
 # ITQ (Control variable)
 ggplot(study_data, aes(x = ITQ)) +
-  geom_histogram(binwidth = 5) +
-  labs(x="Immersive Tendencies")
+  geom_histogram(binwidth = 5, fill = "#0AA57F", alpha = 0.8) +
+  labs(x="Immersive Tendencies", y = "Count") 
 
 # Spatial situation (Response variable)
 ggplot(study_data, aes(x = SSM)) +
-  geom_histogram(binwidth = 0.5) +
-  labs(x="Spatial Situation")
+  geom_histogram(binwidth = 0.5, fill = "#5964B3", alpha = 0.8) +
+  facet_grid(rows = vars(condition)) +
+  labs(x = "Spatial Situation", y = "Count")
 
 # Self-presence (Response variable)
 ggplot(study_data, aes(x = SPSL)) +
-  geom_histogram(binwidth = 0.5) +
-  labs(x="Self-Presence")
+  geom_histogram(binwidth = 0.5, fill = "#3439C8", alpha = 0.8) +
+  facet_grid(rows = vars(condition)) +
+  labs(x="Self-Presence", y = "Count")
 
 # Suspension of disbelief (Response variable)
 ggplot(study_data, aes(x = SoD)) +
-  geom_histogram(binwidth = 0.5)+
-  labs(x="Suspension of Disbelief")
+  geom_histogram(binwidth = 0.5, fill = "#004DC3", alpha = 0.8)+
+  facet_grid(rows = vars(condition)) +
+  labs(x="Suspension of Disbelief", y = "Count")
 
 # Simulator sickness (Response variable)
 ggplot(study_data, aes(x = sim_sick)) +
-  geom_histogram(binwidth = 5) +
-  labs(x="Simulator Sickness")
+  geom_histogram(binwidth = 5, fill = "#490415", alpha = 0.8) +
+  labs(x="Simulator Sickness", y = "Count")
+```
+
+From the visualization, it appears that most of the variables of interest allow us the assumption of near-normality, with the exception of simulator sickness, which is skewed left (since many more participants experience a few minor symptoms than many major symptoms). We will deal with this later. We can confirm this with a Shapiro-Wilk test.
+
+```{r sw-test, warning=FALSE}
+shapiro.test(study_data$sim_sick)
+```
+
+# Hypothesis Tests
+## Presence
+We are interested in whether measures of presence vary significantly between control and breach conditions in each of the three experiments. This is a one-sided test, since we can reasonably hypothesize that presence will be lower in the breach condition.
+
+### Sensory Congruity
+First, looking at the experiment in which sensory congruity was breached, we can visualize the presence measures reported by the two groups (in the control and breach conditions).
+
+```{r sensory-viz}
+sensory_data <- study_data %>%
+  filter(condition == "SENSORY")
+
+# Spatial situation
+sensory_data %>%
+  ggplot(aes(x = control, y = SSM)) +
+  geom_boxplot(fill = "#5964B3", alpha = 0.8) + 
+  xlab("Condition") + ylab("Spatial Situation")
+
+# Self-presence / Self-location
+sensory_data %>%
+  ggplot(aes(x = control, y = SPSL)) +
+  geom_boxplot(fill = "#3439C8", alpha = 0.8) + 
+  xlab("Condition") + ylab("Self-Presence / Self-Location")
+
+# Suspension of disbelief
+sensory_data %>%
+  ggplot(aes(x = control, y = SoD)) +
+  geom_boxplot(fill = "#004DC3", alpha = 0.8) + 
+  xlab("Condition") + ylab("Suspension of Disbelief")
+```
+
+Next, we can run some statistical tests, starting with simple t-tests.
+
+```{r sensory-tests}
+bartlett.test(SSM ~ control, sensory_data)
+t.test(SSM ~ control, sensory_data, alternative = "greater")
+
+bartlett.test(SPSL ~ control, sensory_data)
+t.test(SPSL ~ control, sensory_data, alternative = "greater")
+
+bartlett.test(SoD ~ control, sensory_data)
+t.test(SoD ~ control, sensory_data, alternative = "greater")
 ```
