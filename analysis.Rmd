@@ -9,6 +9,7 @@ library(dplyr)
 library(knitr)
 library(ggplot2)
 library(rstatix)
+library(ggpubr)
 
 study_data <- readRDS("data/congruity_data.rds")
 ```
@@ -21,6 +22,12 @@ Before we beginning our analysis, we check to see if the measured variables of i
 ggplot(study_data, aes(x = ITQ)) +
   geom_histogram(binwidth = 5, fill = "#0AA57F", alpha = 0.8) +
   labs(x="Immersive Tendencies", y = "Count") 
+
+# Spatal presence (Resposne variable)
+ggplot(study_data, aes(x = SPQ)) +
+  geom_histogram(binwidth = 0.5, fill = "skyblue", alpha = 0.8) +
+  facet_grid(rows = vars(condition)) +
+  labs(x = "Spatial Presence", y = "Count")
 
 # Spatial situation (Response variable)
 ggplot(study_data, aes(x = SSM)) +
@@ -214,3 +221,62 @@ thematic_data %>%
 ```
 
 The previous findings are mirrored in the ANCOVA test.
+
+## Spatial Presence
+For the sake of simplicity, it's worth looking at an aggregate measure of spatial presence.
+
+Let's see how this measure stacks up, visually, in the different breaching experiments.
+```{r spq-viz}
+sensory.plot <- study_data %>%
+  filter(condition == "SENSORY") %>%
+  ggplot(aes(x = control, y = SPQ)) +
+  geom_boxplot(fill = "skyblue", alpha = 0.8) + 
+  xlab("Condition") + ylab("Spatial Presence")
+
+enviro.plot <- study_data %>%
+  filter(condition == "ENVIRONMENTAL") %>%
+  ggplot(aes(x = control, y = SPQ)) +
+  geom_boxplot(fill = "skyblue", alpha = 0.8) + 
+  xlab("Condition") + ylab("Spatial Presence")
+
+thematic.plot <- study_data %>%
+  filter(condition == "THEMATIC") %>%
+  ggplot(aes(x = control, y = SPQ)) +
+  geom_boxplot(fill = "skyblue", alpha = 0.8) + 
+  xlab("Condition") + ylab("Spatial Presence")
+
+ggarrange(sensory.plot, enviro.plot, thematic.plot,
+          labels = c("Sensory", "Environmental", "Thematic"),
+          ncol = 3)
+```
+
+This looks like it might give us a clearer picture of the differences between the conditions. Let's try running some tests.
+
+```{r spq-tests}
+# Sensory breach
+bartlett.test(SPQ ~ control, sensory_data)
+t.test(SPQ ~ control, sensory_data, alternative = "greater", var.equal = TRUE)
+
+# Environmental breach
+bartlett.test(SPQ ~ control, enviro_data)
+t.test(SPQ ~ control, enviro_data, alternative = "greater", var.equal = TRUE)
+
+# Thematic breach
+bartlett.test(SPQ ~ control, thematic_data)
+t.test(SPQ ~ control, thematic_data, alternative = "greater", var.equal = TRUE)
+```
+
+This seems to indicate that the differences in overall spatial presence are negligible for the spatial and environmental breaches, but quite significant for the thematic breach. Let's examine this again, controlling for individual differences in immersive tendencies.
+
+```{r spq-tests-control}
+sensory_data %>%
+  anova_test(SPQ ~ ITQ + control, type = 3)
+
+enviro_data %>%
+  anova_test(SPQ ~ ITQ + control, type = 3)
+
+thematic_data %>%
+  anova_test(SPQ ~ ITQ + control, type = 3)
+```
+
+The results from the previous tests are mirrored here.

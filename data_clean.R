@@ -11,6 +11,7 @@
 library(readr)
 library(dplyr)
 library(psych)
+library(fuzzyjoin)
 
 # input -------------------------------------------------------------------
 
@@ -63,7 +64,11 @@ itq_scores <- scoreItems(itq_keys, pre, totals=TRUE)
 spq_keys <- make.keys(post, list(SSM=sprintf("SS%d",seq(1:8)),
                                  SPSL=sprintf("SPSL%d", seq(1:8)),
                                  SoD=c("-SOD1", "SOD2", "-SOD3", "-SOD4", 
-                                  "-SOD5", "-SOD6", "-SOD7", "SOD8")))
+                                  "-SOD5", "-SOD6", "-SOD7", "SOD8"),
+                                 SPQ=c(sprintf("SS%d",seq(1:8)),
+                                        sprintf("SPSL%d", seq(1:8)),
+                                         c("-SOD1", "SOD2", "-SOD3", "-SOD4", 
+                                           "-SOD5", "-SOD6", "-SOD7", "SOD8"))))
 
 spq_scores <- scoreItems(spq_keys, post)
 
@@ -88,7 +93,7 @@ pre %>%
          ITQ_Total, ITQ_Focus, ITQ_Involvement, ITQ_Emotions, ITQ_Jeu) -> pre
 
 post %>% 
-  select(RecordedDate, condition, control, SSM, SPSL, SoD, SimSick) -> post
+  select(RecordedDate, condition, control, SPQ, SSM, SPSL, SoD, SimSick) -> post
 
 # merge -------------------------------------------------------------------
 
@@ -108,13 +113,13 @@ joined %>%
          GENDER, RACE, AGE_1, EDU,
          ITQ_Total, ITQ_Focus, ITQ_Involvement, ITQ_Emotions, ITQ_Jeu,
          condition, control,
-         SSM, SPSL, SoD, SimSick) -> joined
+         SPQ, SSM, SPSL, SoD, SimSick) -> joined
 
 colnames(joined) <- c("id", "date",
                       "gender", "race", "age", "edu",
                       "ITQ", "ITQ_focus", "ITQ_involvement", "ITQ_emotions", "ITQ_jeu",
                       "condition", "control",
-                      "SSM", "SPSL", "SoD", "sim_sick")
+                      "SPQ", "SSM", "SPSL", "SoD", "sim_sick")
 
 # export ------------------------------------------------------------------
 
