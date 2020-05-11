@@ -86,24 +86,78 @@ Next, we can run some statistical tests, starting with simple t-tests.
 
 ```{r sensory-tests}
 bartlett.test(SSM ~ control, sensory_data)
-t.test(SSM ~ control, sensory_data, alternative = "greater")
+t.test(SSM ~ control, sensory_data, alternative = "greater", var.equal = TRUE)
 
 bartlett.test(SPSL ~ control, sensory_data)
-t.test(SPSL ~ control, sensory_data, alternative = "greater")
+t.test(SPSL ~ control, sensory_data, alternative = "greater", var.equal = TRUE)
 
 bartlett.test(SoD ~ control, sensory_data)
-t.test(SoD ~ control, sensory_data, alternative = "greater")
+t.test(SoD ~ control, sensory_data, alternative = "greater", var.equal = TRUE)
 ```
 
 It looks like we can assume equal variances based on the results of Bartlett's tests, but that the differences between groups aren't significant. Let's try again, controlling for individual differences in immersive tendencies using an ANCOVA.
 
 ```{r sensory-tests-control}
 sensory_data %>%
-  anova_test(SSM ~ ITQ + control)
+  anova_test(SSM ~ ITQ + control, type = 3)
 
 sensory_data %>%
-  anova_test(SPSL ~ ITQ + control)
+  anova_test(SPSL ~ ITQ + control, type = 3)
 
 sensory_data %>%
-  anova_test(SoD ~ ITQ + control)
+  anova_test(SoD ~ ITQ + control, type = 3)
 ```
+
+It still doesn't look like there's much of a significant difference between the experimental groups when controlling for immersive tendencies.
+
+### Environment Congruity
+We repeat the above procedure for the second experiment, where environmental congruity was breached.
+
+```{r enviro-viz, warnings = FALSE}
+enviro_data <- study_data %>%
+  filter(condition == "ENVIRONMENTAL")
+
+# Spatial situation
+enviro_data %>%
+  ggplot(aes(x = control, y = SSM)) +
+  geom_boxplot(fill = "#5964B3", alpha = 0.8) + 
+  xlab("Condition") + ylab("Spatial Situation")
+
+# Self-presence / Self-location
+enviro_data %>%
+  ggplot(aes(x = control, y = SPSL)) +
+  geom_boxplot(fill = "#3439C8", alpha = 0.8) + 
+  xlab("Condition") + ylab("Self-Presence / Self-Location")
+
+# Suspension of disbelief
+enviro_data %>%
+  ggplot(aes(x = control, y = SoD)) +
+  geom_boxplot(fill = "#004DC3", alpha = 0.8) + 
+  xlab("Condition") + ylab("Suspension of Disbelief")
+```
+
+```{r enviro-tests}
+bartlett.test(SSM ~ control, enviro_data)
+t.test(SSM ~ control, enviro_data, alternative = "greater", var.equal = TRUE)
+
+bartlett.test(SPSL ~ control, enviro_data)
+t.test(SPSL ~ control, enviro_data, alternative = "greater", var.equal = TRUE)
+
+bartlett.test(SoD ~ control, enviro_data)
+t.test(SoD ~ control, enviro_data, alternative = "greater", var.equal = TRUE)
+```
+
+It looks like there might be a significant difference in suspension of disbelief, based on the T test. Let's see what happens when we control for immersive tendencies.
+
+```{r enviro-tests-control}
+enviro_data %>%
+  anova_test(SSM ~ ITQ + control, type = 3)
+
+enviro_data %>%
+  anova_test(SPSL ~ ITQ + control, type = 3)
+
+enviro_data %>%
+  anova_test(SoD ~ ITQ + control, type = 3)
+```
+
+In this case, because the test is one-sided, a p-value < 0.1 is considered significant, which remains the case for Suspension of Disbelief in the environmnental breach condition, even when controlling for immersive tendencies.
