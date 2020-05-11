@@ -301,4 +301,69 @@ thematic_data.rm_out %>%
 The results from the previous tests are mirrored here.
 
 ## Simulator Sickness
-We are also interested in whether simulator sickness varies significantly between breaching and control conditions. 
+We are also interested in whether simulator sickness varies significantly between breaching and control conditions. Because the data is so heavily skewed left, we will begin by performing a log transform.
+
+```{r ss-clean}
+study_data <- study_data %>% 
+  mutate(sim_sick.log = log10(sim_sick+1)) # This is necessary because of the possibility of a 0 value
+
+# Simulator sickness (Response variable)
+ggplot(study_data, aes(x = sim_sick.log)) +
+  geom_histogram(binwidth = 0.25, fill = "#490415", alpha = 0.8) +
+  labs(x="Simulator Sickness [Log-Transformed]", y = "Count")
+
+shapiro.test(study_data$sim_sick.log)
+```
+
+This is certainly better, but we probably still shouldn't assume normality even for the transformed variable. This means using non-parametric tests (below, a Mann-Whitney U Test).
+
+```{r ss-viz}
+sensory.ss.plot <- study_data %>%
+  filter(condition == "SENSORY") %>%
+  ggplot(aes(x = control, y = sim_sick.log)) +
+  geom_boxplot(fill = "#490415", alpha = 0.8) + 
+  xlab("Condition") + ylab("Simulator Sickness")
+
+enviro.ss.plot <- study_data %>%
+  filter(condition == "ENVIRONMENTAL") %>%
+  ggplot(aes(x = control, y = sim_sick.log)) +
+  geom_boxplot(fill = "#490415", alpha = 0.8) + 
+  xlab("Condition") + ylab("Simulator Sickness")
+
+thematic.ss.plot <- study_data %>%
+  filter(condition == "THEMATIC") %>%
+  ggplot(aes(x = control, y = sim_sick.log)) +
+  geom_boxplot(fill = "#490415", alpha = 0.8) + 
+  xlab("Condition") + ylab("Simulator Sickness")
+
+ggarrange(sensory.ss.plot, enviro.ss.plot, thematic.ss.plot,
+          labels = c("Sensory", "Environmental", "Thematic"),
+          ncol = 3)
+```
+
+We can also remove some outliers here as well, using the same IQR method.
+```{r ss-clean}
+study_data.ss_rm_out <- study_data %>%
+  filter(sim_sick.log < median(study_data$sim_sick.log, na.rm=T) +
+           2*IQR(study_data$sim_sick.log, na.rm=T)) %>%
+  filter(sim_sick.log > median(study_data$sim_sick.log, na.rm=T) -
+           2*IQR(study_data$sim_sick.log, na.rm=T))
+```
+
+This is certainly better, but we probably still shouldn't assume normality even for the transformed variable. This means using non-parametric tests (below, a Mann-Whitney U Test).
+
+```{r ss-tests}
+study_data.ss_rm_out %>%
+  filter(condition== "SENSORY") %>%
+  wilcox.test(sim_sick.log ~ control, data=., correct = FALSE, alternative = "less")
+
+study_data.ss_rm_out %>%
+  filter(condition== "ENVIRONMENTAL") %>%
+  wilcox.test(sim_sick.log ~ control, data=., correct = FALSE, alternative = "less")
+
+study_data.ss_rm_out %>%
+  filter(condition== "THEMATIC") %>%
+  wilcox.test(sim_sick.log ~ control, data=., correct = FALSE, alternative = "less")
+```
+
+It appears that these findings roughly mirror those of the Presence tests, in that only the thematic breach resulted in a significantly higher level of simulator sickness in participants.
