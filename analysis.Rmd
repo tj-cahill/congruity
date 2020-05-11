@@ -8,6 +8,7 @@ output: html_notebook
 library(dplyr)
 library(knitr)
 library(ggplot2)
+library(rstatix)
 
 study_data <- readRDS("data/congruity_data.rds")
 ```
@@ -92,4 +93,17 @@ t.test(SPSL ~ control, sensory_data, alternative = "greater")
 
 bartlett.test(SoD ~ control, sensory_data)
 t.test(SoD ~ control, sensory_data, alternative = "greater")
+```
+
+It looks like we can assume equal variances based on the results of Bartlett's tests, but that the differences between groups aren't significant. Let's try again, controlling for individual differences in immersive tendencies using an ANCOVA.
+
+```{r sensory-tests-control}
+sensory_data %>%
+  anova_test(SSM ~ ITQ + control)
+
+sensory_data %>%
+  anova_test(SPSL ~ ITQ + control)
+
+sensory_data %>%
+  anova_test(SoD ~ ITQ + control)
 ```
