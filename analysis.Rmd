@@ -7,6 +7,37 @@ output: html_notebook
 ```{r setup, include=FALSE}
 library(dplyr)
 library(knitr)
+library(ggplot2)
 
-con.data <- readRDS("data/congruity_data.rds")
+study_data <- readRDS("data/congruity_data.rds")
+```
+
+# Diagnostics
+Before we beginning our analysis, we check to see if the measured variables of interest are nearly-normally distributed, so we can make decisions about what sort of models will be appropriate. We can begin with a quick visual inspection using histograms.
+
+```{r diag}
+# ITQ (Control variable)
+ggplot(study_data, aes(x = ITQ)) +
+  geom_histogram(binwidth = 5) +
+  labs(x="Immersive Tendencies")
+
+# Spatial situation (Response variable)
+ggplot(study_data, aes(x = SSM)) +
+  geom_histogram(binwidth = 0.5) +
+  labs(x="Spatial Situation")
+
+# Self-presence (Response variable)
+ggplot(study_data, aes(x = SPSL)) +
+  geom_histogram(binwidth = 0.5) +
+  labs(x="Self-Presence")
+
+# Suspension of disbelief (Response variable)
+ggplot(study_data, aes(x = SoD)) +
+  geom_histogram(binwidth = 0.5)+
+  labs(x="Suspension of Disbelief")
+
+# Simulator sickness (Response variable)
+ggplot(study_data, aes(x = sim_sick)) +
+  geom_histogram(binwidth = 5) +
+  labs(x="Simulator Sickness")
 ```
