@@ -10,6 +10,7 @@ library(knitr)
 library(ggplot2)
 library(rstatix)
 library(ggpubr)
+library(rcompanion)
 
 study_data <- readRDS("data/congruity_data.rds")
 ```
@@ -357,13 +358,29 @@ study_data.ss_rm_out %>%
   filter(condition== "SENSORY") %>%
   wilcox.test(sim_sick.log ~ control, data=., correct = FALSE, alternative = "less")
 
+# Calculate Cliff's delta for effect size
+study_data.ss_rm_out %>%
+  filter(condition== "SENSORY") %>%
+  cliffDelta(sim_sick.log ~ control, data=.)
+
 study_data.ss_rm_out %>%
   filter(condition== "ENVIRONMENTAL") %>%
   wilcox.test(sim_sick.log ~ control, data=., correct = FALSE, alternative = "less")
 
+# Calculate Cliff's delta for effect size
+study_data.ss_rm_out %>%
+  filter(condition== "ENVIRONMENTAL") %>%
+  cliffDelta(sim_sick.log ~ control, data=.)
+
 study_data.ss_rm_out %>%
   filter(condition== "THEMATIC") %>%
   wilcox.test(sim_sick.log ~ control, data=., correct = FALSE, alternative = "less")
+
+# Calculate Cliff's delta for effect size
+study_data.ss_rm_out %>%
+  filter(condition== "THEMATIC") %>%
+  cliffDelta(sim_sick.log ~ control, data=.)
+
 ```
 
 It appears that these findings roughly mirror those of the Presence tests, in that only the thematic breach resulted in a significantly higher level of simulator sickness in participants.
