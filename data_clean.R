@@ -11,6 +11,7 @@
 library(readr)
 library(dplyr)
 library(lubridate)
+library(tidyr)
 library(psych)
 library(fuzzyjoin)
 
@@ -81,14 +82,32 @@ print(spq_scores$alpha, digits=3)
 pre %>% bind_cols(as.data.frame(itq_scores$scores)) -> pre
 post %>% bind_cols(as.data.frame(spq_scores$scores)) -> post
 
-# Calculate Simulator Sickness Scores
+# Calculate Simulator Sickness Scores [Summation Method]
+# post %>% 
+#   select_at(vars(starts_with("SimSick"))) %>%  
+#   replace(is.na(.), 0) %>%
+#   transmute(SimSick = rowSums(.)) %>%
+#   bind_cols(post, .) -> post
+
+# Calculate Simulator Sickness Scores [Weighted Method]
+# Weights based on Kennedy et al. (1993)
 post %>% 
-  select_at(vars(starts_with("SimSick"))) %>%  
-  replace(is.na(.), 0) %>%
-  transmute(SimSick = rowSums(.)) %>%
-  bind_cols(post, .) -> post
+  mutate(across(starts_with("SimSick"), ~replace_na(., 0))) %>%
+  mutate(SimSick_1 = SimSick_A_1 + SimSick_A_6 + SimSick_A_7 + SimSick_A_8 +  
+                     SimSick_B_1 + SimSick_B_7 + SimSick_B_8,
+         SimSick_2 = SimSick_A_1 + SimSick_A_2 + SimSick_A_3 + SimSick_A_4 + 
+                     SimSick_A_5 + SimSick_B_1 + SimSick_B_3,
+         SimSick_3 = SimSick_A_5 + SimSick_A_8 + SimSick_B_1 + SimSick_B_2 + 
+                     SimSick_B_3 + SimSick_B_4 + SimSick_B_5 + SimSick_B_6,
+         SimSick_N = SimSick_1 * 9.54,
+         SimSick_O = SimSick_2 * 7.58,
+         SimSick_D = SimSick_3 * 13.92,
+         SimSick = (SimSick_1 + SimSick_2 + SimSick_3) * 3.74) -> post
+         
+         
 
 # Trim redundant columns
+# Note: If using weighted SSQ, subscales for Nausea, Oculomotor Distress and Nausea may also be retained
 pre %>%
   select(RecordedDate, GENDER, RACE, AGE_1, EDU,
          ITQ_Total, ITQ_Focus, ITQ_Involvement, ITQ_Emotions, ITQ_Jeu) -> pre

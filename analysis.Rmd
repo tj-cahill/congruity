@@ -15,6 +15,8 @@ library(rcompanion)
 study_data <- readRDS("data/congruity_data.rds")
 ```
 
+> **AUTHOR'S NOTE**: This notebook was originally prepared based on results derived from the unweighted calculation of SSQ. Consequently, not all commentary may apply to computed results at present.
+
 # Diagnostics
 Before we beginning our analysis, we check to see if the measured variables of interest are nearly-normally distributed, so we can make decisions about what sort of models will be appropriate. We can begin with a quick visual inspection using histograms.
 
@@ -343,7 +345,7 @@ ggarrange(sensory.ss.plot, enviro.ss.plot, thematic.ss.plot,
 ```
 
 We can also remove some outliers here as well, using the same IQR method.
-```{r ss-clean}
+```{r ss-clean2}
 study_data.ss_rm_out <- study_data %>%
   filter(sim_sick.log < median(study_data$sim_sick.log, na.rm=T) +
            2*IQR(study_data$sim_sick.log, na.rm=T)) %>%
