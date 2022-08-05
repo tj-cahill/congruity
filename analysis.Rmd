@@ -141,6 +141,15 @@ ggarrange(sensory.plot, enviro.plot, thematic.plot,
 Let's try running some tests.
 
 ```{r spq-tests}
+sensory_data <- study_data %>%
+  filter(condition == "SENSORY")
+
+enviro_data <- study_data %>%
+  filter(condition == "ENVIRONMENTAL")
+
+thematic_data <- study_data %>%
+  filter(condition == "THEMATIC")
+
 # Sensory breach
 bartlett.test(SPQ ~ control, sensory_data)
 t.test(SPQ ~ control, sensory_data, alternative = "greater", var.equal = TRUE)
@@ -173,9 +182,6 @@ The results from the previous tests are mirrored here.
 First, looking at the experiment in which sensory congruity was breached, we can visualize the presence measures reported by the two groups (in the control and breach conditions).
 
 ```{r sensory-viz}
-sensory_data <- study_data %>%
-  filter(condition == "SENSORY")
-
 # Spatial situation
 sensory_data %>%
   ggplot(aes(x = control, y = SSM)) +
@@ -227,9 +233,6 @@ It still doesn't look like there's much of a significant difference between the 
 We repeat the above procedure for the second experiment, where environmental congruity was breached.
 
 ```{r enviro-viz, warnings = FALSE}
-enviro_data <- study_data %>%
-  filter(condition == "ENVIRONMENTAL")
-
 # Spatial situation
 enviro_data %>%
   ggplot(aes(x = control, y = SSM)) +
@@ -280,9 +283,6 @@ In this case, because the test is one-sided, a p-value < 0.1 is considered signi
 Finally, let's repeat all of the above steps for the thematic breach condition.
 
 ```{r thematic-viz, warnings = FALSE}
-thematic_data <- study_data %>%
-  filter(condition == "THEMATIC")
-
 # Spatial situation
 thematic_data %>%
   ggplot(aes(x = control, y = SSM)) +
@@ -332,6 +332,10 @@ The previous findings are mirrored in the ANCOVA test.
 We are also interested in whether simulator sickness varies significantly between breaching and control conditions. Because the data is so heavily skewed left, we will begin by performing a log transform.
 
 ```{r ss-clean}
+ggplot(study_data, aes(x = sim_sick)) +
+  geom_histogram(binwidth = 20, fill = "#490415", alpha = 0.8) +
+  labs(x = "Simulator Sickness", y = "Frequency")
+
 study_data <- study_data %>% 
   mutate(sim_sick.log = log10(sim_sick+1)) # This is necessary because of the possibility of a 0 value
 
@@ -369,42 +373,42 @@ ggarrange(sensory.ss.plot, enviro.ss.plot, thematic.ss.plot,
           ncol = 3)
 ```
 
-We can also remove some outliers here as well, using the same IQR method.
-```{r ss-clean2}
-study_data.ss_rm_out <- study_data %>%
-  filter(sim_sick.log < median(study_data$sim_sick.log, na.rm=T) +
-           2*IQR(study_data$sim_sick.log, na.rm=T)) %>%
-  filter(sim_sick.log > median(study_data$sim_sick.log, na.rm=T) -
-           2*IQR(study_data$sim_sick.log, na.rm=T))
-```
+<!-- We can also remove some outliers here as well, using the same IQR method. -->
+<!-- ```{r ss-clean2} -->
+<!-- study_data.ss_rm_out <- study_data %>% -->
+<!--   filter(sim_sick < median(study_data$sim_sick, na.rm=T) + -->
+<!--            2*IQR(study_data$sim_sick, na.rm=T)) %>% -->
+<!--   filter(sim_sick > median(study_data$sim_sick, na.rm=T) - -->
+<!--            2*IQR(study_data$sim_sick, na.rm=T)) -->
+<!-- ``` -->
 
 This is certainly better, but we probably still shouldn't assume normality even for the transformed variable. This means using non-parametric tests (below, a Mann-Whitney U Test).
 
 ```{r ss-tests}
-study_data.ss_rm_out %>%
+study_data %>%
   filter(condition== "SENSORY") %>%
   wilcox.test(sim_sick.log ~ control, data=., correct = FALSE, alternative = "less")
 
 # Calculate Cliff's delta for effect size
-study_data.ss_rm_out %>%
+study_data %>%
   filter(condition== "SENSORY") %>%
   cliffDelta(sim_sick.log ~ control, data=.)
 
-study_data.ss_rm_out %>%
+study_data %>%
   filter(condition== "ENVIRONMENTAL") %>%
   wilcox.test(sim_sick.log ~ control, data=., correct = FALSE, alternative = "less")
 
 # Calculate Cliff's delta for effect size
-study_data.ss_rm_out %>%
+study_data %>%
   filter(condition== "ENVIRONMENTAL") %>%
   cliffDelta(sim_sick.log ~ control, data=.)
 
-study_data.ss_rm_out %>%
+study_data %>%
   filter(condition== "THEMATIC") %>%
   wilcox.test(sim_sick.log ~ control, data=., correct = FALSE, alternative = "less")
 
 # Calculate Cliff's delta for effect size
-study_data.ss_rm_out %>%
+study_data %>%
   filter(condition== "THEMATIC") %>%
   cliffDelta(sim_sick.log ~ control, data=.)
 
