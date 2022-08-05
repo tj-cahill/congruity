@@ -276,51 +276,51 @@ ggarrange(sensory.plot, enviro.plot, thematic.plot,
           ncol = 3)
 ```
 
-This looks like it might give us a clearer picture of the differences between the conditions; however, it also appears that there may be some outliers in the data. Let's first remove those.
+<!-- This looks like it might give us a clearer picture of the differences between the conditions; however, it also appears that there may be some outliers in the data. Let's first remove those. -->
 
-```{r spq-clean}
-study_data.rm_out <- study_data %>%
-  filter(SPQ < median(study_data$SPQ, na.rm=T) +
-           2*IQR(study_data$SPQ, na.rm=T)) %>%
-  filter(SPQ > median(study_data$SPQ, na.rm=T) -
-           2*IQR(study_data$SPQ, na.rm=T))
+<!-- ```{r spq-clean} -->
+<!-- study_data.rm_out <- study_data %>% -->
+<!--   filter(SPQ < median(study_data$SPQ, na.rm=T) + -->
+<!--            2*IQR(study_data$SPQ, na.rm=T)) %>% -->
+<!--   filter(SPQ > median(study_data$SPQ, na.rm=T) - -->
+<!--            2*IQR(study_data$SPQ, na.rm=T)) -->
 
-sensory_data.rm_out <- study_data.rm_out %>%
-  filter(condition == "SENSORY")
+<!-- sensory_data.rm_out <- study_data.rm_out %>% -->
+<!--   filter(condition == "SENSORY") -->
 
-enviro_data.rm_out <- study_data.rm_out %>%
-  filter(condition == "ENVIRONMENTAL")
+<!-- enviro_data.rm_out <- study_data.rm_out %>% -->
+<!--   filter(condition == "ENVIRONMENTAL") -->
 
-thematic_data.rm_out <- study_data.rm_out %>%
-  filter(condition == "THEMATIC")
-```
+<!-- thematic_data.rm_out <- study_data.rm_out %>% -->
+<!--   filter(condition == "THEMATIC") -->
+<!-- ``` -->
 
 Let's try running some tests.
 
 ```{r spq-tests}
 # Sensory breach
-bartlett.test(SPQ ~ control, sensory_data.rm_out)
-t.test(SPQ ~ control, sensory_data.rm_out, alternative = "greater", var.equal = TRUE)
+bartlett.test(SPQ ~ control, sensory_data)
+t.test(SPQ ~ control, sensory_data, alternative = "greater", var.equal = TRUE)
 
 # Environmental breach
-bartlett.test(SPQ ~ control, enviro_data.rm_out)
-t.test(SPQ ~ control, enviro_data.rm_out, alternative = "greater", var.equal = TRUE)
+bartlett.test(SPQ ~ control, enviro_data)
+t.test(SPQ ~ control, enviro_data, alternative = "greater", var.equal = TRUE)
 
 # Thematic breach
-bartlett.test(SPQ ~ control, thematic_data.rm_out)
-t.test(SPQ ~ control, thematic_data.rm_out, alternative = "greater", var.equal = TRUE)
+bartlett.test(SPQ ~ control, thematic_data)
+t.test(SPQ ~ control, thematic_data, alternative = "greater", var.equal = TRUE)
 ```
 
 This seems to indicate that the differences in overall spatial presence are negligible for the spatial and environmental breaches, but quite significant for the thematic breach. Let's examine this again, controlling for individual differences in immersive tendencies.
 
 ```{r spq-tests-control}
-sensory_data.rm_out %>%
+sensory_data %>%
   anova_test(SPQ ~ ITQ + control, type = 3)
 
-enviro_data.rm_out %>%
+enviro_data %>%
   anova_test(SPQ ~ ITQ + control, type = 3)
 
-thematic_data.rm_out %>%
+thematic_data %>%
   anova_test(SPQ ~ ITQ + control, type = 3)
 ```
 
