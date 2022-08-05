@@ -132,13 +132,13 @@ It looks like we can assume equal variances based on the results of Bartlett's t
 
 ```{r sensory-tests-control}
 sensory_data %>%
-  anova_test(SSM ~ ITQ + control, type = 3)
+  anova_test(SSM ~ ITQ + control, type = 2, effect.size = "ges", observed = "ITQ")
 
 sensory_data %>%
-  anova_test(SPSL ~ ITQ + control, type = 3)
+  anova_test(SPSL ~ ITQ + control, type = 2, effect.size = "ges", observed = "ITQ")
 
 sensory_data %>%
-  anova_test(SoD ~ ITQ + control, type = 3)
+  anova_test(SoD ~ ITQ + control, type = 2, effect.size = "ges", observed = "ITQ")
 ```
 
 It still doesn't look like there's much of a significant difference between the experimental groups when controlling for immersive tendencies.
@@ -184,13 +184,13 @@ It looks like there might be a significant difference in suspension of disbelief
 
 ```{r enviro-tests-control}
 enviro_data %>%
-  anova_test(SSM ~ ITQ + control, type = 3)
+  anova_test(SSM ~ ITQ + control, type = 2, effect.size = "ges", observed = "ITQ")
 
 enviro_data %>%
-  anova_test(SPSL ~ ITQ + control, type = 3)
+  anova_test(SPSL ~ ITQ + control, type = 2, effect.size = "ges", observed = "ITQ")
 
 enviro_data %>%
-  anova_test(SoD ~ ITQ + control, type = 3)
+  anova_test(SoD ~ ITQ + control, type = 2, effect.size = "ges", observed = "ITQ")
 ```
 
 In this case, because the test is one-sided, a p-value < 0.1 is considered significant, which remains the case for Suspension of Disbelief in the environmnental breach condition, even when controlling for immersive tendencies.
@@ -237,13 +237,13 @@ It appears that self-presence / self-location is significantly lower in the them
 
 ```{r thematic-tests-control}
 thematic_data %>%
-  anova_test(SSM ~ ITQ + control, type = 3)
+  anova_test(SSM ~ ITQ + control, type = 2, effect.size = "ges", observed = "ITQ")
 
 thematic_data %>%
-  anova_test(SPSL ~ ITQ + control, type = 3)
+  anova_test(SPSL ~ ITQ + control, type = 2, effect.size = "ges", observed = "ITQ")
 
 thematic_data %>%
-  anova_test(SoD ~ ITQ + control, type = 3)
+  anova_test(SoD ~ ITQ + control, type = 2, effect.size = "ges", observed = "ITQ")
 ```
 
 The previous findings are mirrored in the ANCOVA test.
@@ -315,13 +315,13 @@ This seems to indicate that the differences in overall spatial presence are negl
 
 ```{r spq-tests-control}
 sensory_data %>%
-  anova_test(SPQ ~ ITQ + control, type = 3)
+  anova_test(SPQ ~ ITQ + control, type = 2, effect.size = "ges", observed = "ITQ")
 
 enviro_data %>%
-  anova_test(SPQ ~ ITQ + control, type = 3)
+  anova_test(SPQ ~ ITQ + control, type = 2, effect.size = "ges", observed = "ITQ")
 
 thematic_data %>%
-  anova_test(SPQ ~ ITQ + control, type = 3)
+  anova_test(SPQ ~ ITQ + control, type = 2, effect.size = "ges", observed = "ITQ")
 ```
 
 The results from the previous tests are mirrored here.
