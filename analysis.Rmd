@@ -66,6 +66,29 @@ shapiro.test(study_data$sim_sick)
 ## Presence
 We are interested in whether measures of presence vary significantly between control and breach conditions in each of the three experiments. This is a one-sided test, since we can reasonably hypothesize that presence will be lower in the breach condition.
 
+### Covariates
+Establish, firstly, that there is a correlation between ITQ and SPQ, indicating that this is a relavent control variable.
+```{r cor-test}
+cor.test(study_data$ITQ, y = study_data$SPQ, alternative = "greater", method = "pearson")
+```
+
+### Overall Breaching Effects
+
+```{r presence-viz}
+study_data %>%
+  ggplot(aes(x = control, y = SPQ)) + 
+  geom_violin(fill = "lightgreen", alpha = 0.8) +
+  xlab("Condition") + ylab("Spatial Presence") +
+  stat_summary(fun.y=mean, geom="point", shape=23, size=2)
+```
+
+```{r presence-test}
+bartlett.test(SPQ ~ control, study_data)
+t.test(SPQ ~ control, study_data, alternative = "greater", var.equal = T)
+study_data %>%
+  anova_test(SPQ ~ ITQ + control, type = 2, effect.size = "ges", observed = "ITQ")
+```
+
 ### Sensory Congruity
 First, looking at the experiment in which sensory congruity was breached, we can visualize the presence measures reported by the two groups (in the control and breach conditions).
 
