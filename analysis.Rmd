@@ -87,6 +87,8 @@ bartlett.test(SPQ ~ control, study_data)
 t.test(SPQ ~ control, study_data, alternative = "greater", var.equal = T)
 study_data %>%
   anova_test(SPQ ~ ITQ + control, type = 2, effect.size = "ges", observed = "ITQ")
+
+
 ```
 
 For the sake of simplicity, it's worth looking at an aggregate measure of spatial presence.
@@ -347,8 +349,6 @@ ggplot(study_data, aes(x = sim_sick.log)) +
 shapiro.test(study_data$sim_sick.log)
 ```
 
-This is certainly better, but we probably still shouldn't assume normality even for the transformed variable. This means using non-parametric tests (below, a Mann-Whitney U Test).
-
 ```{r ss-viz}
 sensory.ss.plot <- study_data %>%
   filter(condition == "SENSORY") %>%
@@ -386,31 +386,34 @@ This is certainly better, but we probably still shouldn't assume normality even 
 
 ```{r ss-tests}
 study_data %>%
+  wilcox.test(sim_sick ~ control, data =., correct = FALSE, alternative = "less")
+
+study_data %>%
   filter(condition== "SENSORY") %>%
-  wilcox.test(sim_sick.log ~ control, data=., correct = FALSE, alternative = "less")
+  wilcox.test(sim_sick ~ control, data=., correct = FALSE, alternative = "less")
 
 # Calculate Cliff's delta for effect size
 study_data %>%
   filter(condition== "SENSORY") %>%
-  cliffDelta(sim_sick.log ~ control, data=.)
+  cliffDelta(sim_sick ~ control, data=.)
 
 study_data %>%
   filter(condition== "ENVIRONMENTAL") %>%
-  wilcox.test(sim_sick.log ~ control, data=., correct = FALSE, alternative = "less")
+  wilcox.test(sim_sick ~ control, data=., correct = FALSE, alternative = "less")
 
 # Calculate Cliff's delta for effect size
 study_data %>%
   filter(condition== "ENVIRONMENTAL") %>%
-  cliffDelta(sim_sick.log ~ control, data=.)
+  cliffDelta(sim_sick ~ control, data=.)
 
 study_data %>%
   filter(condition== "THEMATIC") %>%
-  wilcox.test(sim_sick.log ~ control, data=., correct = FALSE, alternative = "less")
+  wilcox.test(sim_sick ~ control, data=., correct = FALSE, alternative = "less")
 
 # Calculate Cliff's delta for effect size
 study_data %>%
   filter(condition== "THEMATIC") %>%
-  cliffDelta(sim_sick.log ~ control, data=.)
+  cliffDelta(sim_sick ~ control, data=.)
 
 ```
 
