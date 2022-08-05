@@ -96,23 +96,26 @@ Let's see how this measure stacks up, visually, in the different breaching exper
 sensory.plot <- study_data %>%
   filter(condition == "SENSORY") %>%
   ggplot(aes(x = control, y = SPQ)) +
-  geom_boxplot(fill = "skyblue", alpha = 0.8) + 
-  xlab("Condition") + ylab("Spatial Presence")
+  geom_boxplot(fill = "#E69F00", alpha = 0.8) + 
+  ylim(1,5) +
+  labs(title="Sensory", x = "Condition", y = "Spatial Presence")
 
 enviro.plot <- study_data %>%
   filter(condition == "ENVIRONMENTAL") %>%
   ggplot(aes(x = control, y = SPQ)) +
-  geom_boxplot(fill = "skyblue", alpha = 0.8) + 
-  xlab("Condition") + ylab("Spatial Presence")
+  geom_boxplot(fill = "#56B4E9", alpha = 0.8) + 
+  ylim(1,5) +
+  labs(title="Environmental", x = "Condition", y = "Spatial Presence")
 
 thematic.plot <- study_data %>%
   filter(condition == "THEMATIC") %>%
   ggplot(aes(x = control, y = SPQ)) +
-  geom_boxplot(fill = "skyblue", alpha = 0.8) + 
-  xlab("Condition") + ylab("Spatial Presence")
+  geom_boxplot(fill = "#009E73", alpha = 0.8) + 
+  ylim(1,5) +
+  labs(title="Thematic", x = "Condition", y = "Spatial Presence")
 
 ggarrange(sensory.plot, enviro.plot, thematic.plot,
-          labels = c("Sensory", "Environmental", "Thematic"),
+        # labels = c("Sensory", "Environmental", "Thematic"),
           ncol = 3)
 ```
 
