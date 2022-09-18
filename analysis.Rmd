@@ -86,9 +86,7 @@ study_data %>%
 bartlett.test(SPQ ~ control, study_data)
 t.test(SPQ ~ control, study_data, alternative = "greater", var.equal = T)
 study_data %>%
-  anova_test(SPQ ~ ITQ + control, type = 2, effect.size = "ges", observed = "ITQ")
-
-
+  anova_test(SPQ ~ ITQ + control , type = 2, effect.size = "ges", observed = "ITQ")
 ```
 
 For the sake of simplicity, it's worth looking at an aggregate measure of spatial presence.
@@ -353,23 +351,25 @@ shapiro.test(study_data$sim_sick.log)
 sensory.ss.plot <- study_data %>%
   filter(condition == "SENSORY") %>%
   ggplot(aes(x = control, y = sim_sick.log)) +
-  geom_boxplot(fill = "#490415", alpha = 0.8) + 
-  xlab("Condition") + ylab("Simulator Sickness")
+  ylim(0, 4) +
+  geom_boxplot(fill = "#E69F00", alpha = 0.8) + 
+  labs(title="Sensory", x = "Condition", y = "Simulator Sickness")
 
 enviro.ss.plot <- study_data %>%
   filter(condition == "ENVIRONMENTAL") %>%
   ggplot(aes(x = control, y = sim_sick.log)) +
-  geom_boxplot(fill = "#490415", alpha = 0.8) + 
-  xlab("Condition") + ylab("Simulator Sickness")
+  ylim(0, 4) +
+  geom_boxplot(fill = "#56B4E9", alpha = 0.8) +
+  labs(title="Environmental", x = "Condition", y = "Simulator Sickness")
 
 thematic.ss.plot <- study_data %>%
   filter(condition == "THEMATIC") %>%
   ggplot(aes(x = control, y = sim_sick.log)) +
-  geom_boxplot(fill = "#490415", alpha = 0.8) + 
-  xlab("Condition") + ylab("Simulator Sickness")
+  ylim(0, 4) +
+  geom_boxplot(fill = "#009E73", alpha = 0.8) + 
+  labs(title="Thematic", x = "Condition", y = "Simulator Sickness")
 
 ggarrange(sensory.ss.plot, enviro.ss.plot, thematic.ss.plot,
-          labels = c("Sensory", "Environmental", "Thematic"),
           ncol = 3)
 ```
 
@@ -387,6 +387,9 @@ This is certainly better, but we probably still shouldn't assume normality even 
 ```{r ss-tests}
 study_data %>%
   wilcox.test(sim_sick ~ control, data =., correct = FALSE, alternative = "less")
+
+study_data %>% 
+  cliffDelta(sim_sick ~ control, data=.)
 
 study_data %>%
   filter(condition== "SENSORY") %>%
